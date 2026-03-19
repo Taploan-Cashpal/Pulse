@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekwande Supermarket - Checkout</title>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, sans-serif;
+            background: #f4f7f6;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            background: #2e7d32; 
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        .shop-name { font-size: 22px; font-weight: bold; text-transform: uppercase; }
+        .price-tag { font-size: 48px; font-weight: bold; margin: 10px 0; }
+        .price-label { font-size: 13px; opacity: 0.8; }
+
+        .container { padding: 15px; max-width: 400px; margin: -20px auto 0; }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        .section-title { font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px; color: #2e7d32; }
+        .row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; }
+        .bold { font-weight: bold; }
+
+        .pay-btn {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .pay-btn:hover { background: #1b5e20; }
+        
+        .footer-text { text-align: center; font-size: 11px; color: #999; margin-top: 20px; padding: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="shop-name">Ekwande Supermarket</div>
+        <div class="price-tag">GH₵ <span id="display-amount">151.77</span></div>
+        <div class="price-label">Total Amount Due</div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="section-title">Order Summary</div>
+            <div class="row">
+                <span>Customer Name</span>
+                <span class="bold" id="customer-name">Cobbina Arthur</span>
+            </div>
+            <div class="row">
+                <span>Order ID</span>
+                <span class="bold">#EKW-77421</span>
+            </div>
+            <div class="row">
+                <span>Location</span>
+                <span>Zenu, Ashaiman (GB)</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="row" style="align-items: center;">
+                <div>
+                    <div class="bold">Secure Payment</div>
+                    <div style="font-size: 11px; color: #666;">Mobile Money / Card</div>
+                </div>
+                <img src="https://cdn-icons-png.flaticon.com/512/1019/1019607.png" width="40" alt="cart">
+            </div>
+            <br>
+            <button class="pay-btn" id="pay-btn" onclick="payWithPaystack()">Confirm & Pay</button>
+        </div>
+
+        <div class="footer-text">
+            For support, contact <b>orders@ekwande-market.com</b><br>
+            Thank you for choosing Ekwande Supermarket!
+        </div>
+    </div>
+
+<script>
+    function payWithPaystack() {
+        const btn = document.getElementById('pay-btn');
+        const customer = document.getElementById('customer-name').innerText;
+        const amount = 151.77; 
+
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        const handler = PaystackPop.setup({
+            key: 'pk_live_xxxxxxxxxxxxxxxxxxxxxxxx', 
+            email: 'sales@ekwande-market.com', 
+            amount: Math.round(amount * 100), 
+            currency: 'GHS',
+            ref: 'EKW-ORD-' + Math.floor(Math.random() * 1000000), 
+            metadata: {
+                custom_fields: [
+                    { display_name: "Customer Name", variable_name: "customer", value: customer },
+                    { display_name: "Type", variable_name: "type", value: "Retail Purchase" }
+                ]
+            },
+            callback: function(response) {
+                alert('Order Paid! Reference: ' + response.reference);
+                window.location.reload();
+            },
+            onClose: function() {
+                btn.disabled = false;
+                btn.innerText = "Confirm & Pay";
+            }
+        });
+        handler.openIframe();
+    }
+</script>
+</body>
+</html>
